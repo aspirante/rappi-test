@@ -1,0 +1,49 @@
+
+Rappi Test - CODE
+
+- Packages
+
+- activities.
+
+    AppActivity .- Actividad principal en la cual es manejada la vista pral.
+
+- adapter.
+
+    RecyclerViewAdapater .- La cual se encarga del grid de imagenes. El cual de utilizo un Holder para la persistencia
+                            de la informacion.
+
+    ViewPageAdapter.- Se encarga del manejo de los fragmentos acorde al tab selecionado.
+
+- app
+
+    TestRappiapplication.- Singleton el cual se encarga de inicializar APIs para el consumo del servico TMDb asi como
+                           de variables grales. utilizadas en la app.
+
+- fragments
+
+    Contiene las clases para mostrar las vistas de cada tab.
+
+- model
+
+    CardItem .- Clase utilizada como model para la generacion de objetos los cuales son generados apartir del consumo
+                un service. La conversion se utilizo la API GSON.
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+- APIs.
+
+    volley.- Para el consumo de servicio TMDb.
+    gson.- Para la conversion de JSON a objectos y tener mejor manejo de la informacion para la aplicacion.
+    glide.- Para el manejo de imagenes ya que estas son obtenidas de un servicio.
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+Nota:
+
+    Por la premura de tiempo, la busqueda con el searchView quedo incompleta ya que tiene un detalle al actualizar los
+    fragments. La pruebas unitar NO se realizaron.
+
