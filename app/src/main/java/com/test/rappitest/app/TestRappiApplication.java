@@ -16,8 +16,7 @@ public class TestRappiApplication extends Application {
     public static final String ARRAY_NAME_RESULTS = "results";
     public static boolean  filtering = false;
 
-    public static final String TAG = TestRappiApplication.class
-            .getSimpleName();
+    public static final String TAG = TestRappiApplication.class.getSimpleName();
 
     private RequestQueue mRequestQueue;
 

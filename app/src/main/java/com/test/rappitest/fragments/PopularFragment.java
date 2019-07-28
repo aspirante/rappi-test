@@ -1,11 +1,9 @@
 package com.test.rappitest.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -36,9 +34,11 @@ public class PopularFragment extends Fragment {
     private List<CardItem> mItemsList;
     private RecyclerViewAdapter mAdapter;
     private View mView;
-    private Context mContext;
 
-    public PopularFragment() {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -49,12 +49,15 @@ public class PopularFragment extends Fragment {
         mItemsList = new ArrayList<>();
 
         mRecyclerView = mView.findViewById(R.id.recyclerview);
-        mAdapter = new RecyclerViewAdapter(getContext(), mItemsList);
+        mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), TestRappiApplication.GRID_COULUMS_SIZE));
-        mRecyclerView.setAdapter(mAdapter);
-        setHasOptionsMenu(true);
 
         fetchPopulars();
+
+        mAdapter = new RecyclerViewAdapter(getContext(), mItemsList);
+        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+
 
         return mView;
     }
@@ -90,7 +93,8 @@ public class PopularFragment extends Fragment {
                 mItemsList.addAll(items);
 
                 // refres recyclerview
-                mAdapter.notifyDataSetChanged();
+                mAdapter.setmData(mItemsList);
+                mRecyclerView.setAdapter(mAdapter);
 
             }
         }, new Response.ErrorListener() {
@@ -124,19 +128,28 @@ public class PopularFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
         getActivity().getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        MenuItem serachItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) serachItem.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mAdapter.getFilter().filter(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mAdapter.getFilter().filter(newText);
-                return true;
+
+                if (newText == null || newText.isEmpty()) {
+                    mAdapter.setmData(mItemsList);
+                    mRecyclerView.setAdapter(mAdapter);
+                    return false;
+                }
+
+                mAdapter.setmData(mAdapter.filteredList(newText, mItemsList));
+
+                mRecyclerView.setAdapter(mAdapter);
+
+                return false;
             }
         });
     }

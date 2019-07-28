@@ -36,14 +36,11 @@ public class TopRatedFragment extends Fragment {
     private RecyclerViewAdapter mAdapter;
     private View mView;
 
-    public TopRatedFragment() {
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        mView = inflater.inflate(R.layout.top_rated_fragment,container,false);
+        mView = inflater.inflate(R.layout.top_rated_fragment, container, false);
         mItemsList = new ArrayList<>();
 
         mRecyclerView = mView.findViewById(R.id.recyclerview);
@@ -88,7 +85,8 @@ public class TopRatedFragment extends Fragment {
                 mItemsList.addAll(items);
 
                 // refres recyclerview
-                mAdapter.notifyDataSetChanged();
+                mAdapter.setmData(mItemsList);
+                mRecyclerView.setAdapter(mAdapter);
 
             }
         }, new Response.ErrorListener() {
@@ -127,14 +125,23 @@ public class TopRatedFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mAdapter.getFilter().filter(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mAdapter.getFilter().filter(newText);
-                return true;
+
+                if (newText == null || newText.isEmpty()) {
+                    mAdapter.setmData(mItemsList);
+                    mRecyclerView.setAdapter(mAdapter);
+                    return false;
+                }
+
+                mAdapter.setmData(mAdapter.filteredList(newText, mItemsList));
+
+                mRecyclerView.setAdapter(mAdapter);
+
+                return false;
             }
         });
 

@@ -10,8 +10,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
@@ -23,17 +21,24 @@ import com.test.rappitest.model.CardItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> implements Filterable {
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
 
     private Context mContext;
     private Dialog mDetailsItem;
 
-    private List<CardItem> mData;
-    private List<CardItem> contactListFiltered;
+    public List<CardItem> getmData() {
+        return mData;
+    }
 
-    public RecyclerViewAdapter(Context mContext, List<CardItem> mData) {
-        this.mContext = mContext;
+    public void setmData(List<CardItem> mData) {
         this.mData = mData;
+    }
+
+    private List<CardItem> mData;
+
+    public RecyclerViewAdapter(Context mContext, List<CardItem> mListData) {
+        this.mContext = mContext;
+        this.mData = mListData;
     }
 
     @Override
@@ -88,38 +93,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return mData.size();
     }
 
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString();
-                if (charString.isEmpty()) {
-                    contactListFiltered = mData;
-                } else {
-                    List<CardItem> filteredList = new ArrayList<>();
-                    for (CardItem row : mData) {
+    public List<CardItem> filteredList(String strFilter, List<CardItem> listItems) {
+        List<CardItem> filteredValues = new ArrayList<CardItem>(listItems);
 
-                        // Looking for title match
-                        if (row.getTitle().toLowerCase().contains(charString.toLowerCase()) || row.getOriginal_title().contains(charSequence)) {
-                            filteredList.add(row);
-                        }
-                    }
-
-                    contactListFiltered = filteredList;
-                }
-
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = contactListFiltered;
-                return filterResults;
+        for (CardItem value : listItems) {
+            if (!value.getTitle().toLowerCase().contains(strFilter.toLowerCase()) || value.getOriginal_title().contains(strFilter)) {
+                filteredValues.remove(value);
             }
-
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                mData = (ArrayList<CardItem>) filterResults.values;
-                notifyDataSetChanged();
-            }
-        };
+        }
+        return filteredValues;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

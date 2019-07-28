@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -37,13 +35,10 @@ public class UpComingFragment extends Fragment {
     private RecyclerViewAdapter mAdapter;
     private View mView;
 
-    public UpComingFragment() {
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.upcoming_fragment,container,false);
+        mView = inflater.inflate(R.layout.upcoming_fragment, container, false);
         mRecyclerView = mView.findViewById(R.id.recyclerview);
         mItemsList = new ArrayList<>();
 
@@ -89,7 +84,8 @@ public class UpComingFragment extends Fragment {
                 mItemsList.addAll(items);
 
                 // refres recyclerview
-                mAdapter.notifyDataSetChanged();
+                mAdapter.setmData(mItemsList);
+                mRecyclerView.setAdapter(mAdapter);
 
             }
         }, new Response.ErrorListener() {
@@ -121,52 +117,31 @@ public class UpComingFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        getActivity().getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        inflater.inflate(R.menu.menu_main, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mAdapter.getFilter().filter(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mAdapter.getFilter().filter(newText);
-                return true;
-            }
-        });
 
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    // searchView expanded
-                    Log.v("test","searchView expanded");
+                if (newText == null || newText.isEmpty()) {
+                    mAdapter.setmData(mItemsList);
+                    mRecyclerView.setAdapter(mAdapter);
+                    return false;
+                }
 
-                } else {
-                    // searchView not expanded
-                    Log.v("test","searchView not expanded");
-                    fetchUpComing();
-              }
+                mAdapter.setmData(mAdapter.filteredList(newText, mItemsList));
+
+                mRecyclerView.setAdapter(mAdapter);
+
+                return false;
             }
         });
     }
 
-    @Override
-
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-
-        super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser){
-
-//            actionView();
-        }
-        else{
-            //no
-        }
-
-    }
 }
